@@ -3,6 +3,10 @@ const server = http.createServer();
 
 const PORT = 3000;
 
+server.on('data', (data) => {
+    console.log(`Received message: ${data}`);
+  });
+
 server.on('request', (req, res) => {
     if (req.method === 'POST') {
         console.log('Received message from client');
