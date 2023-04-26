@@ -1,17 +1,19 @@
-const net = require('net');
+const http = require('http');
+const server = http.createServer();
 
-const server = net.createServer((socket) => {
-  console.log('Client connected');
+const PORT = 3000;
 
-  socket.on('data', (data) => {
-    console.log(`Received message: ${data}`);
-  });
-
-  socket.on('end', () => {
-    console.log('Client disconnected');
-  });
+server.on('request', (req, res) => {
+    if (req.method === 'POST') {
+        console.log('Received message from client');
+        // Process the message from the client and update the game state
+        const gameState = { player: 'X', board: [null, null, null, null, null, null, null, null, null] };
+        // Send the updated game state to all clients
+        res.write(JSON.stringify(gameState));
+        res.end();
+    }
 });
 
-server.listen(3000, () => {
-  console.log('Sa as');
+server.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`);
 });
