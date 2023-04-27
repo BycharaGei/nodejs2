@@ -7,7 +7,7 @@ const PORT = 3000;
 const clients = [];
 
 server.on('request', (req, res) => {
-    if (req.method === 'POST') {
+    if (req.method === 'CONNECT') {
         console.log('Received message from client');
         const gameState = { player: 'X', board: [null, null, null, null, null, null, null, null, null] };
         clients.forEach((c) => {
@@ -15,7 +15,7 @@ server.on('request', (req, res) => {
             c.res.end();
         });
     }
-    if (req.method === 'WAIT') {
+    if (req.method === 'POST') {
         console.log('client is waiting');
         const client = { res };
         clients.push(client);
