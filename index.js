@@ -1,4 +1,4 @@
-/*const http = require('http');
+const http = require('http');
 const server = http.createServer();
 
 const PORT = 3000;
@@ -27,9 +27,9 @@ server.on('request', (req, res) => {
 
 server.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
-});*/
+});
 
-const http = require('http');
+/*const http = require('http');
 
 const PORT = 3000;
 
@@ -71,3 +71,4 @@ setInterval(() => {
         waitingConnections.splice(0, waitingConnections.length);
     }
 }, 5000);
+*/
