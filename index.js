@@ -7,7 +7,7 @@ const PORT = 3000;
 const clients = [];
 
 server.on('request', (req, res) => {
-    if (req.method === 'GET') {
+    if (req.method === 'POST') {
         console.log('Received message from client');
         const gameState = { player: 'X', board: [null, null, null, null, null, null, null, null, null] };
         clients.forEach((c) => {
