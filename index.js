@@ -21,7 +21,7 @@ server.on('request', (req, res) => {
         clients.push(client);
     }
 });
-//
+
 server.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
 });
