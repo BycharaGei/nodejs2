@@ -9,19 +9,16 @@ const clients = [];
 server.on('request', (req, res) => {
     if (req.method === 'POST') {
         console.log('Received message from client');
-
-        // Add the new client to the clients array
-        const client = { res };
-        clients.push(client);
-
-        // Process the message from the client and update the game state
         const gameState = { player: 'X', board: [null, null, null, null, null, null, null, null, null] };
-
-        // Send the updated game state to all clients
         clients.forEach((c) => {
             c.res.write(JSON.stringify(gameState));
             c.res.end();
         });
+    }
+    if (req.method === 'WAIT') {
+        console.log('client is waiting');
+        const client = { res };
+        clients.push(client);
     }
 });
 
