@@ -1,4 +1,4 @@
-const http = require('http');
+/*const http = require('http');
 const server = http.createServer();
 
 const PORT = 3000;
@@ -27,7 +27,47 @@ server.on('request', (req, res) => {
 
 server.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
+});*/
+
+const http = require('http');
+
+const PORT = 3000;
+
+const waitingConnections = [];
+
+const server = http.createServer((req, res) => {
+    if (req.method === 'POST') {
+        let data = '';
+        req.on('data', (chunk) => {
+            data += chunk;
+        });
+        req.on('end', () => {
+            if (data === 'CONNECT') {
+                res.write('CONNECTED');
+                res.end();
+            } else if (data === 'WAITING') {
+                waitingConnections.push(res);
+            } else if (data === 'WAITING AGAIN') {
+                // Do nothing, already waiting
+            }
+        });
+    } else if (req.method === 'GET' && req.url === '/waiting') {
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        waitingConnections.push(res);
+    }
 });
 
+server.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`);
+});
 
-//
+setInterval(() => {
+    if (waitingConnections.length > 0) {
+        const message = 'MESSAGE';
+        waitingConnections.forEach((conn) => {
+            conn.write(message);
+            conn.end();
+        });
+        waitingConnections.splice(0, waitingConnections.length);
+    }
+}, 5000);
