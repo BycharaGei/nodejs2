@@ -5,6 +5,60 @@ const PORT = 3000;
 
 // Array to store all connected clients
 const clients = [];
+let firstNumber, secondNumber;
+
+server.on('request', (req, res) => {
+    if (req.method === 'POST') {
+        const body = [];
+        req.on('data', (chunk) => {
+            body.push(chunk);
+        }).on('end', () => {
+            const message = Buffer.concat(body).toString();
+            if (message === 'connecting') {
+                console.log('Received "connecting" message from client');
+                const client = { res };
+                clients.push(client);
+                res.write(JSON.stringify({ numbers: `${firstNumber},${secondNumber}` }));
+                res.end();
+            } else if (message === 'waiting') {
+                console.log('Received "waiting" message from client');
+                const client = { res };
+                clients.push(client);
+            } else {
+                console.log('Received invalid message from client');
+                res.statusCode = 400;
+                res.end();
+            }
+        });
+    }
+});
+
+server.listen(PORT, () => {
+    console.log(`Server listening on port ${PORT}`);
+    setInterval(() => {
+        if (clients.length >= 2) {
+            console.log('Two clients are now connected');
+            firstNumber = Math.floor(Math.random() * 100);
+            secondNumber = Math.floor(Math.random() * 100);
+            const result = firstNumber + secondNumber;
+            const message = { numbers: `${firstNumber},${secondNumber}`, result };
+            clients.forEach((c) => {
+                c.res.write(JSON.stringify(message));
+                c.res.end();
+            });
+            clients.splice(0, clients.length);
+        }
+    }, 1000);
+});
+
+
+/*const http = require('http');
+const server = http.createServer();
+
+const PORT = 3000;
+
+// Array to store all connected clients
+const clients = [];
 
 server.on('request', (req, res) => {
     if (req.method === 'POST') {
@@ -25,7 +79,7 @@ server.on('request', (req, res) => {
 server.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
 });
-//
+//*/
 /*const http = require('http');
 
 const PORT = 3000;
