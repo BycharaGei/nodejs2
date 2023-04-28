@@ -3,6 +3,86 @@ const server = http.createServer();
 
 const PORT = 3000;
 
+// Arrays to store all connected clients
+const players = [];
+const spectators = [];
+let host = null;
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+
+function playGame() {
+  let currentPlayerIndex = getRandomInt(players.length);
+  while (true) {
+    const currentPlayer = players[currentPlayerIndex];
+    currentPlayer.res.write(`Enter your turn (a, b):`);
+    currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+
+    currentPlayer.req.once('data', (data) => {
+      const [a, b] = data.toString().trim().split(',');
+      const message = `Player ${currentPlayerIndex + 1} played (${a}, ${b})`;
+      console.log(message);
+      players.forEach((p) => p.res.write(message));
+      spectators.forEach((s) => s.res.write(message));
+    });
+  }
+}
+
+server.on('request', (req, res) => {
+  if (req.method === 'POST') {
+    const data = req.url.split(':')[1];
+    if (data === 'connecting:player') {
+      if (players.length < 4) {
+        const client = { req, res };
+        players.push(client);
+        spectators.push(client);
+        res.write('successfully connected as player\n');
+        console.log(`Player ${players.length} connected`);
+      } else {
+        res.write('failed to connect: too many players\n');
+      }
+      res.end();
+    } else if (data === 'connecting:spectator') {
+      const client = { req, res };
+      spectators.push(client);
+      res.write('successfully connected as spectator\n');
+      console.log('Spectator connected');
+      res.end();
+    } else if (data === 'connecting:host') {
+      if (host === null) {
+        const client = { req, res };
+        host = client;
+        spectators.push(client);
+        res.write('successfully connected as host\n');
+        console.log('Host connected');
+        res.end();
+        playGame();
+      } else {
+        res.write('failed to connect: host already exists\n');
+        res.end();
+      }
+    } else {
+      res.write('failed to connect: invalid connection request\n');
+      res.end();
+    }
+  } else {
+    res.write('Invalid request\n');
+    res.end();
+  }
+});
+
+server.listen(PORT, () => {
+  console.log(`Server listening on port ${PORT}`);
+});
+
+
+
+/*const http = require('http');
+const server = http.createServer();
+
+const PORT = 3000;
+
 // Array to store all connected clients
 const clients = [];
 let firstNumber, secondNumber;
@@ -49,77 +129,4 @@ server.listen(PORT, () => {
             clients.splice(0, clients.length);
         }
     }, 1000);
-});
-
-
-/*const http = require('http');
-const server = http.createServer();
-
-const PORT = 3000;
-
-// Array to store all connected clients
-const clients = [];
-
-server.on('request', (req, res) => {
-    if (req.method === 'POST') {
-        console.log('Received message from client');
-        const gameState = { player: 'X', board: [null, null, null, null, null, null, null, null, null] };
-        clients.forEach((c) => {
-            c.res.write(JSON.stringify(gameState));
-            c.res.end();
-        });
-    }
-    if (req.method === 'POST') {
-        console.log('client is waiting');
-        const client = { res };
-        clients.push(client);
-    }
-});
-
-server.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
-});
-//*/
-/*const http = require('http');
-
-const PORT = 3000;
-
-const waitingConnections = [];
-
-const server = http.createServer((req, res) => {
-    if (req.method === 'POST') {
-        let data = '';
-        req.on('data', (chunk) => {
-            data += chunk;
-        });
-        req.on('end', () => {
-            if (data === 'CONNECT') {
-                res.write('CONNECTED');
-                res.end();
-            } else if (data === 'WAITING') {
-                waitingConnections.push(res);
-            } else if (data === 'WAITING AGAIN') {
-                // Do nothing, already waiting
-            }
-        });
-    } else if (req.method === 'GET' && req.url === '/waiting') {
-        res.writeHead(200, { 'Content-Type': 'text/plain' });
-        waitingConnections.push(res);
-    }
-});
-
-server.listen(PORT, () => {
-    console.log(`Server listening on port ${PORT}`);
-});
-
-setInterval(() => {
-    if (waitingConnections.length > 0) {
-        const message = 'MESSAGE';
-        waitingConnections.forEach((conn) => {
-            conn.write(message);
-            conn.end();
-        });
-        waitingConnections.splice(0, waitingConnections.length);
-    }
-}, 5000);
-*/
+});*/
