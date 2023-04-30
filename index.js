@@ -44,7 +44,7 @@ server.on('request', (req, res) =>
             if (message === 'connect:host') 
             {
                 console.log('connect host');
-                if (host != null)
+                if (host == null)
                 {
                     const client = { res };
                     players.push(client);
