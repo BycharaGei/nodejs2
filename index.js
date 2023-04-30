@@ -21,13 +21,14 @@ server.on('request', (req, res) =>
                 console.log('connect player');
                 const client = { res };
                 alreadyConnected = false;
-                players.forEach(player =>
+                for (let i = 0; i < players.length; i++) 
+                {
+                    if (players[i].res === res) 
                     {
-                        if (player === client)
-                        {
-                            alreadyConnected = true;
-                        }
-                    });
+                        alreadyConnected = true;
+                        break;
+                    }
+                }
                 if (players.length - host.length < 3 && !alreadyConnected)
                 {
                     players.push(client);
