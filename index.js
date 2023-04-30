@@ -27,7 +27,7 @@ server.on('request', (req, res) =>
                 {
                     dataSent.push(false);
                     activePlayers.push(true);
-                    res.write("success:" + activePlayers.length);
+                    res.write("success:" + (activePlayers.length - 1));
                     res.end();
                 }
                 else
@@ -43,8 +43,8 @@ server.on('request', (req, res) =>
                 {
                     dataSent.push(false);
                     activePlayers.push(true);
-                    host = activePlayers.length;
-                    res.write("success:" + activePlayers.length);
+                    host = (activePlayers.length - 1);
+                    res.write("success:" + (activePlayers.length - 1));
                     res.end();
                 }
                 else
