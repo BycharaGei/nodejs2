@@ -68,6 +68,10 @@ server.on('request', (req, res) =>
                     res.end();
                 }
             }
+            if (message === 'host:start' && res === host[0].res)
+            {
+                console.log("host startet");
+            }
             if (host.length > 0)
             {
                 console.log('host exists');
