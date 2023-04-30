@@ -3,7 +3,7 @@ const server = http.createServer();
 const PORT = 3000;
 const players = [];
 const spectators = [];
-const host = null;
+let host;
 
 server.on('request', (req, res) => 
 {
