@@ -4,7 +4,7 @@ const PORT = 3000;
 const players = [];
 const spectators = [];
 const host = [];
-////1
+
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
@@ -86,6 +86,7 @@ server.on('request', (req, res) =>
             }
             console.log(spectators.length);
             console.log(players.length);
+            console.log(message);
         });
     }
 });
