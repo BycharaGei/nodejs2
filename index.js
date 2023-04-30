@@ -7,6 +7,7 @@ server.on('request', (req, res) =>
 {
     if (req.method === 'POST') 
     {
+        console.log("fartet");
         const body = [];
         req.on('data', (chunk) => 
         {
