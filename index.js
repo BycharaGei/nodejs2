@@ -1,10 +1,8 @@
 const http = require('http');
 const server = http.createServer();
 const PORT = 3000;
-const players = [];
-const spectators = [];
-const host = [];
-//
+const clients = [];
+
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
@@ -16,77 +14,16 @@ server.on('request', (req, res) =>
         }).on('end', () => 
         {
             const message = Buffer.concat(body).toString();
-            if (message === 'connect:player') 
+            if (message === 'connect') 
             {
                 console.log('connect player');
                 const client = { res };
-                alreadyConnected = false;
-                for (let i = 0; i < players.length; i++) 
+                clients.push(client);
+                for (let i = 0; i < clients.length; ++i)
                 {
-                    if (players[i].res === res) 
-                    {
-                        alreadyConnected = true;
-                        break;
-                    }
-                }
-                if (players.length - host.length < 3 && !alreadyConnected)
-                {
-                    players.push(client);
-                    spectators.push(client);
-                    res.write("success");
-                    res.end();
-                }
-                else
-                {
-                    res.write("fail");
-                    res.end();
+                    clients[i].res.write("fart");
                 }
             } 
-            else if (message === 'connect:spectator') 
-            {
-                console.log('connect spectator');
-                const client = { res };
-                spectators.push(client);
-                res.write("success");
-                res.end();
-            }
-            if (message === 'connect:host') 
-            {
-                console.log('connect host');
-                if (host.length == 0)
-                {
-                    const client = { res };
-                    players.push(client);
-                    spectators.push(client);
-                    host.push(client);
-                    res.write("success");
-                    res.end();
-                }
-                else
-                {
-                    res.write("fail");
-                    res.end();
-                }
-            }
-            if (message === 'host:start')
-            {
-                console.log("fart");
-            }
-            if (message === 'host:start' && res === host[0].res)
-            {
-                console.log("host startet");
-            }
-            if (host.length > 0)
-            {
-                console.log('host exists');
-            }
-            else
-            {
-                console.log('no host');
-            }
-            console.log(spectators.length);
-            console.log(players.length);
-            console.log(message);
         });
     }
 });
