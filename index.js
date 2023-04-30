@@ -19,7 +19,7 @@ server.on('request', (req, res) =>
             if (message === 'connect:player') 
             {
                 console.log('connect player');
-                if (players.size() < 3)
+                if (players.length < 3)
                 {
                     const client = { res };
                     players.push(client);
@@ -67,8 +67,8 @@ server.on('request', (req, res) =>
             {
                 console.log('no host');
             }
-            console.log(spectators.size());
-            console.log(players.size());
+            console.log(spectators.length);
+            console.log(players.length);
         });
     }
 });
