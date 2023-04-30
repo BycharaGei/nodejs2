@@ -36,7 +36,7 @@ server.on('request', (req, res) =>
             else if (message === 'connect:spectator') 
             {
                 console.log('connect spectator');
-                const client = { res };d
+                const client = { res };
                 spectators.push(client);
                 res.write("success");
                 res.end();
