@@ -3,7 +3,7 @@ const server = http.createServer();
 const PORT = 3000;
 const players = [];
 const spectators = [];
-let host;
+const host = [];
 
 server.on('request', (req, res) => 
 {
@@ -44,12 +44,12 @@ server.on('request', (req, res) =>
             if (message === 'connect:host') 
             {
                 console.log('connect host');
-                if (host == null)
+                if (host.length == 0)
                 {
                     const client = { res };
                     players.push(client);
                     spectators.push(client);
-                    host = client;
+                    host.push(client);
                     res.write("success");
                     res.end();
                 }
@@ -59,7 +59,7 @@ server.on('request', (req, res) =>
                     res.end();
                 }
             }
-            if (host != null)
+            if (host.length > 0)
             {
                 console.log('host exists');
             }
