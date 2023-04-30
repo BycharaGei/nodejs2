@@ -1,13 +1,17 @@
 const http = require('http');
+const { arch } = require('os');
 const server = http.createServer();
 const PORT = 3000;
-const clients = [];
+const players = [];
+const dataSent = [];
+const activePlayers = [];
+let host = -1;
+let currentTurn = 0;
 
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
     {
-        console.log("fartet");
         const body = [];
         req.on('data', (chunk) => 
         {
@@ -15,16 +19,50 @@ server.on('request', (req, res) =>
         }).on('end', () => 
         {
             const message = Buffer.concat(body).toString();
-            if (message === 'connect') 
+            const splitMessage = message.split(":");
+            if (message === 'connect:player') 
             {
                 console.log('connect player');
-                const client = { res };
-                clients.push(client);
-                for (let i = 0; i < clients.length; ++i)
+                if (activePlayers.length - (host == -1 ? 0 : 1) < 3)
                 {
-                    clients[i].res.write("fart");
+                    dataSent.push(false);
+                    activePlayers.push(true);
+                    res.write("success:" + activePlayers.length);
+                    res.end();
                 }
-            } 
+                else
+                {
+                    res.write("fail");
+                    res.end();
+                }
+            }
+            if (message === 'connect:host') 
+            {
+                console.log('connect host');
+                if (host == -1)
+                {
+                    dataSent.push(false);
+                    activePlayers.push(true);
+                    host = activePlayers.length;
+                    res.write("success:" + activePlayers.length);
+                    res.end();
+                }
+                else
+                {
+                    res.write("fail");
+                    res.end();
+                }
+            }
+            if (splitMessage[0] === 'host')
+            {
+                console.log("host");
+                if (splitMessage[1] === 'start' && parseInt(splitMessage[2]) == host)
+                {
+                    console.log("startet");
+                }
+            }
+            console.log(activePlayers.length);
+            console.log(message);
         });
     }
 });
