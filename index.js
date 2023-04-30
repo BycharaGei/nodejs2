@@ -4,7 +4,7 @@ const PORT = 3000;
 const players = [];
 const spectators = [];
 const host = [];
-//
+
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
@@ -67,6 +67,10 @@ server.on('request', (req, res) =>
                     res.write("fail");
                     res.end();
                 }
+            }
+            if (message === 'host:start')
+            {
+                console.log("fart");
             }
             if (message === 'host:start' && res === host[0].res)
             {
