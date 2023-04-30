@@ -65,8 +65,10 @@ server.on('request', (req, res) =>
             }
             else
             {
-                console.log("no host");
+                console.log('no host');
             }
+            console.log(spectators.size());
+            console.log(players.size());
         });
     }
 });
