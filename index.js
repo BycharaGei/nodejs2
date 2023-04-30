@@ -1,8 +1,9 @@
 const http = require('http');
 const server = http.createServer();
 const PORT = 3000;
-const clients = [];
-let firstNumber, secondNumber;
+const players = [];
+const spectators = [];
+const host = null;
 
 server.on('request', (req, res) => 
 {
@@ -18,18 +19,53 @@ server.on('request', (req, res) =>
             if (message === 'connect:player') 
             {
                 console.log('connect player');
-                //const client = { res };
-                //clients.push(client);
+                if (players.size() < 3)
+                {
+                    const client = { res };
+                    players.push(client);
+                    spectators.push(client);
+                    res.write("success");
+                    res.end();
+                }
+                else
+                {
+                    res.write("fail");
+                    res.end();
+                }
+            } 
+            else if (message === 'connect:spectator') 
+            {
+                console.log('connect spectator');
+                const client = { res };d
+                spectators.push(client);
                 res.write("success");
                 res.end();
-            } 
-            else if (message === 'connect:host') 
+            }
+            if (message === 'connect:host') 
             {
                 console.log('connect host');
-                //const client = { res };
-                //clients.push(client);
-                res.write("fail");
-                res.end();
+                if (host != null)
+                {
+                    const client = { res };
+                    players.push(client);
+                    spectators.push(client);
+                    host = client;
+                    res.write("success");
+                    res.end();
+                }
+                else
+                {
+                    res.write("fail");
+                    res.end();
+                }
+            }
+            if (host != null)
+            {
+                console.log('host exists');
+            }
+            else
+            {
+                console.log("no host");
             }
         });
     }
