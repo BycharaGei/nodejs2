@@ -19,18 +19,17 @@ server.on('request', (req, res) =>
             if (message === 'connect:player') 
             {
                 console.log('connect player');
+                const client = { res };
                 alreadyConnected = false;
                 players.forEach(player =>
                     {
-                        if (player === res)
+                        if (player === client)
                         {
                             alreadyConnected = true;
                         }
                     });
                 if (players.length - host.length < 3 && !alreadyConnected)
                 {
-
-                    const client = { res };
                     players.push(client);
                     spectators.push(client);
                     res.write("success");
