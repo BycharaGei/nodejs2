@@ -4,7 +4,7 @@ const PORT = 3000;
 const players = [];
 const spectators = [];
 const host = [];
-
+//
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
