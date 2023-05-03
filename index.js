@@ -55,7 +55,7 @@ server.on('request', (req, res) =>
                                 if (!foundFalse)
                                 {
                                     dataSendingRequired = false;
-                                    dataSent = null;
+                                    dataToSend = null;
                                 }
                             }
                         }
@@ -97,7 +97,7 @@ server.on('request', (req, res) =>
                                 if (!foundFalse)
                                 {
                                     dataSendingRequired = false;
-                                    dataSent = null;
+                                    dataToSend = null;
                                 }
                             }
                         }
