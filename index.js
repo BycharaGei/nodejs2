@@ -17,7 +17,7 @@ let firstTurnCompleted = false;
 const firstTurnTerminated = [];
 let allFirstTurnsTerminated = false;
 let firstTurnData = "makefirstturn:";
-//1
+
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
@@ -201,6 +201,11 @@ server.on('request', (req, res) =>
                         currentPlayer = 0;
                         firstTurnData = "makefirstturn:";
                     }
+                }
+                if (splitMessage[0] === 'waitingfirstturn')
+                {
+                    res.write("wait");
+                        es.end();
                 }
             }
         });
