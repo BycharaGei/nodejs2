@@ -71,7 +71,7 @@ server.on('request', (req, res) =>
                     else if (splitMessage[0] === 'turn' && parseInt(splitMessage[1]) == currentPlayer)
                     {
                         makeTurn(parseInt(splitMessage[2]), parseInt(splitMessage[3]));
-                        res.write("");
+                        res.write("wait");
                         res.end();
                     }
                 }
@@ -147,7 +147,7 @@ server.on('request', (req, res) =>
                             dataSent[i] = false;
                         }
                         dataSendingRequired = true;
-                        res.write("");
+                        res.write("wait");
                         res.end();
                     }
                 }
