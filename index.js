@@ -274,7 +274,7 @@ function makeTurn(row, column)
             {
                 if (cellValues[i][j] > 3)
                 {
-                    cellsToPop.push({i, j});
+                    cellsToPop.push([i, j]);
                 }
             }
         }
