@@ -17,7 +17,7 @@ let firstTurnCompleted = false;
 const firstTurnTerminated = [];
 let allFirstTurnsTerminated = false;
 let firstTurnData = "makefirstturn:";
-//
+
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
@@ -74,6 +74,11 @@ server.on('request', (req, res) =>
                         res.write("wait");
                         res.end();
                     }
+                    else
+                    {
+                        res.write("wait");
+                        res.end();
+                    }
                 }
                 else
                 {
@@ -99,6 +104,7 @@ server.on('request', (req, res) =>
                                 {
                                     dataSendingRequired = false;
                                     dataToSend = null;
+                                    console.log("all first turn data sent");
                                 }
                             }
                         }
@@ -148,6 +154,11 @@ server.on('request', (req, res) =>
                             dataSent[i] = false;
                         }
                         dataSendingRequired = true;
+                        res.write("wait");
+                        res.end();
+                    }
+                    else
+                    {
                         res.write("wait");
                         res.end();
                     }
@@ -321,3 +332,45 @@ function makeTurn(row, column)
     while (!activePlayers[newPlayer]);
     currentPlayer = newPlayer;
 }
+
+/*import java.io.*;
+import java.net.*;
+
+public class LongPollingClient {
+    private static final String SERVER_URL = "https://nodejs-production-e5a3.up.railway.app";
+    private static final String CONNECTING_MESSAGE = "connecting";
+    private static final String WAITING_MESSAGE = "waiting";
+
+    public static void main(String[] args) {
+        try {
+            URL url = new URL(SERVER_URL);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod("POST");
+            connection.setDoOutput(true);
+            OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
+            out.write(CONNECTING_MESSAGE);
+            out.flush();
+            out.close();
+            connection.disconnect();
+
+            while (true) {
+                HttpURLConnection waitingConnection = (HttpURLConnection) url.openConnection();
+                waitingConnection.setRequestMethod("POST");
+                waitingConnection.setDoOutput(true);
+                OutputStreamWriter waitingOut = new OutputStreamWriter(waitingConnection.getOutputStream());
+                waitingOut.write(WAITING_MESSAGE);
+                waitingOut.flush();
+                waitingOut.close();
+
+                BufferedReader in = new BufferedReader(new InputStreamReader(waitingConnection.getInputStream()));
+                String message = in.readLine();
+                if (message != null) {
+                    System.out.println("Received message from server: " + message);
+                }
+                waitingConnection.disconnect();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}*/
