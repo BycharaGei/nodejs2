@@ -17,7 +17,7 @@ let firstTurnCompleted = false;
 const firstTurnTerminated = [];
 let allFirstTurnsTerminated = false;
 let firstTurnData = "makefirstturn:";
-//
+
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
@@ -66,16 +66,16 @@ server.on('request', (req, res) =>
                                 res.write("maketurn");
                                 res.end();
                             }
+                            else
+                            {
+                                res.write("wait");
+                                res.end();
+                            }
                         }
                     }
                     else if (splitMessage[0] === 'turn' && parseInt(splitMessage[1]) == currentPlayer)
                     {
                         makeTurn(parseInt(splitMessage[2]), parseInt(splitMessage[3]));
-                        res.write("wait");
-                        res.end();
-                    }
-                    else
-                    {
                         res.write("wait");
                         res.end();
                     }
@@ -142,6 +142,11 @@ server.on('request', (req, res) =>
                                     }
                                 }
                             }
+                            else
+                            {
+                                res.write("wait");
+                                res.end();
+                            }
                         }
                     }
                     else if (splitMessage[0] === 'firstturn' && parseInt(splitMessage[1]) == currentPlayer)
@@ -154,11 +159,6 @@ server.on('request', (req, res) =>
                             dataSent[i] = false;
                         }
                         dataSendingRequired = true;
-                        res.write("wait");
-                        res.end();
-                    }
-                    else
-                    {
                         res.write("wait");
                         res.end();
                     }
