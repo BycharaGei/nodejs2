@@ -1,7 +1,6 @@
 const http = require('http');
 const server = http.createServer();
 const PORT = 3000;
-const players = [];
 const dataSent = [];
 const activePlayers = [];
 let host = -1;
@@ -17,7 +16,9 @@ let firstTurnCompleted = false;
 const firstTurnTerminated = [];
 let allFirstTurnsTerminated = false;
 let firstTurnData = "makefirstturn:";
-//
+let resetting = false;
+const resetted = [];
+
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
@@ -30,8 +31,37 @@ server.on('request', (req, res) =>
         {
             const message = Buffer.concat(body).toString();
             const splitMessage = message.split(":");
-            
-            if (gameStarted)
+            if (resetting && splitMessage[0] != "connect")
+            {
+                if (parseInt(splitMessage[1]) != host)
+                {
+                    res.write("resetplayer");
+                    res.end();
+                }
+                resetted[parseInt(splitMessage[1])] = true;
+                let foundFalse = false;
+                for (let i = 0; i < resetted.length; ++i)
+                {
+                    if (!resetted[i])
+                    {
+                        foundFalse = true;
+                    }
+                }
+                if (!foundFalse)
+                {
+                    activePlayers.length = 0;
+                    activePlayers.push(true);
+                    dataSent.length = 0;
+                    dataSent.push(false);
+                    firstTurnTerminated.length = 0;
+                    firstTurnTerminated.push(false);
+                    resetted.length = 0;
+                    resetted.push(false);
+                    host = 0;
+                    resetting = false;
+                }
+            }
+            else if (gameStarted)
             {
                 if (firstTurnCompleted)
                 {
@@ -177,11 +207,12 @@ server.on('request', (req, res) =>
                 if (message === 'connect:player') 
                 {
                     console.log('connect player');
-                    if (activePlayers.length - (host == -1 ? 0 : 1) < 3)
+                    if (activePlayers.length - (host == -1 ? 0 : 1) < 3 && !resetting)
                     {
                         dataSent.push(false);
                         activePlayers.push(true);
                         firstTurnTerminated.push(false);
+                        resetted.push(false);
                         res.write("success:" + (activePlayers.length - 1));
                         res.end();
                     }
@@ -194,11 +225,12 @@ server.on('request', (req, res) =>
                 if (message === 'connect:host') 
                 {
                     console.log('connect host');
-                    if (host == -1)
+                    if (host == -1 && !resetting)
                     {
                         dataSent.push(false);
                         activePlayers.push(true);
                         firstTurnTerminated.push(false);
+                        resetted.push(false);
                         host = (activePlayers.length - 1);
                         res.write("success:" + (activePlayers.length - 1));
                         res.end();
@@ -212,7 +244,7 @@ server.on('request', (req, res) =>
                 if (splitMessage[0] === 'host')
                 {
                     console.log("host");
-                    if (splitMessage[1] === 'start' && parseInt(splitMessage[2]) == host)
+                    if (splitMessage[1] === 'start' && parseInt(splitMessage[2]) == host && !resetting)
                     {
                         console.log("startet");
                         gameStarted = true;
@@ -220,6 +252,36 @@ server.on('request', (req, res) =>
                         allFirstTurnsTerminated = false;
                         currentPlayer = 0;
                         firstTurnData = "makefirstturn:";
+                        res.write(currentPlayer.toString());
+                        res.end();
+                    }
+                    else if (splitMessage[1] === 'reset' && parseInt(splitMessage[2]) == host)
+                    {
+                        resetting = true;
+                        resetted[currentPlayer] = true;
+                    }
+                    else if (splitMessage[1] === 'deactivate' && parseInt(splitMessage[2]) == host)
+                    {
+                        activePlayers[parseInt(splitMessage[3])] = false;
+                        if (currentPlayer == parseInt(splitMessage[3]))
+                        {
+                            for (let i = 0; i < activePlayers.length; ++i)
+                            {
+                                currentPlayer++;
+                                if (currentPlayer == activePlayers.length)
+                                {
+                                    currentPlayer = 0;
+                                }
+                                if (activePlayers[currentPlayer])
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else if (splitMessage[1] === 'activate' && parseInt(splitMessage[2]) == host)
+                    {
+                        activePlayers[parseInt(splitMessage[3])] = true;
                     }
                 }
                 if (splitMessage[0] === 'waitingfirstturn')
