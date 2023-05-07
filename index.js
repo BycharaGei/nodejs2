@@ -178,6 +178,8 @@ server.on('request', (req, res) =>
                     {
                         dataToSend = "setcells:" + splitMessage[2].toString() + "," + splitMessage[3].toString() + ",1," + currentPlayer.toString() + ";";
                         firstTurnData += splitMessage[2].toString() + "," + splitMessage[3].toString() + ";";
+                        cellColors[parseInt(splitMessage[2])][parseInt(splitMessage[3])] = parseInt(splitMessage[1]);
+                        cellValues[parseInt(splitMessage[2])][parseInt(splitMessage[3])] = 1;
                         currentPlayer++;
                         for (let i = 0; i < dataSent.length; ++i)
                         {
