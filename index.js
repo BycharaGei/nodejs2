@@ -17,7 +17,7 @@ let firstTurnCompleted = false;
 const firstTurnTerminated = [];
 let allFirstTurnsTerminated = false;
 let firstTurnData = "makefirstturn:";
-//
+
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
@@ -79,6 +79,11 @@ server.on('request', (req, res) =>
                         res.write("wait");
                         res.end();
                     }
+                    else if(splitMessage[0] === 'waitingfirstturn')
+                    {
+                        res.write("firstturnsover");
+                        res.end();
+                    }
                 }
                 else
                 {
@@ -117,35 +122,6 @@ server.on('request', (req, res) =>
                             }
                             else if (currentPlayer == activePlayers.length)
                             {
-                                /*if (allFirstTurnsTerminated)
-                                {
-                                    currentPlayer = 0;
-                                    firstTurnCompleted = true;
-                                    console.log("all first turns terminated");
-                                }
-                                else
-                                {
-                                    firstTurnTerminated[parseInt(splitMessage[1])] = true;
-                                    res.write("firstturnsover");
-                                    res.end();
-                                    console.log("terminated first turn " + splitMessage[1]);
-                                    let foundFalse = false;
-                                    for (let i = 0; i < firstTurnTerminated.length; ++i)
-                                    {
-                                        if (!firstTurnTerminated[i])
-                                        {
-                                            foundFalse = true;
-                                            break;
-                                        }
-                                    }
-                                    if (!foundFalse)
-                                    {
-                                        allFirstTurnsTerminated = true;
-                                        currentPlayer = 0;
-                                        firstTurnCompleted = true;
-                                        console.log("all first turns terminated");
-                                    }
-                                }*/
                                 firstTurnTerminated[parseInt(splitMessage[1])] = true;
                                 res.write("firstturnsover");
                                 res.end();
@@ -369,7 +345,7 @@ function makeTurn(row, column)
     for (let i = 0; i < activePlayers.length; ++i)
     {
         currentPlayer++;
-        if (currentPlayer == activePlayers.length)
+        if (currentPlayer >= activePlayers.length)
         {
             currentPlayer = 0;
         }
