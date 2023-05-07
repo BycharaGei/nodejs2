@@ -346,7 +346,7 @@ function makeTurn(row, column)
             }
         }
     }
-    let lastPlayer = currentPlayer;
+    /*let lastPlayer = currentPlayer;
     let newPlayer = currentPlayer;
     do
     {
@@ -361,7 +361,19 @@ function makeTurn(row, column)
         }
     }
     while (!activePlayers[newPlayer]);
-    currentPlayer = newPlayer;
+    currentPlayer = newPlayer;*/
+    for (let i = 0; i < activePlayers.length; ++i)
+    {
+        currentPlayer++;
+        if (currentPlayer = activePlayers.length)
+        {
+            currentPlayer = 0;
+        }
+        if (activePlayers[currentPlayer])
+        {
+            break;
+        }
+    }
 }
 
 /*import java.io.*;
