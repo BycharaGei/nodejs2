@@ -264,9 +264,10 @@ function makeTurn(row, column)
     let newData = "setcells:";
     cellValues[row][column]++;
     newData += row.toString() + "," + column.toString() + "," + cellValues[row][column].toString() + "," + currentPlayer.toString() + ";";
+    let cellsToPop = [];
     do
     {
-        let cellsToPop = [];
+        cellsToPop = [];
         for (let i = 0; i < rows; ++i)
         {
             for (let j = 0; j < columns; ++j)
