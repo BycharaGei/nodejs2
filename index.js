@@ -73,7 +73,7 @@ server.on('request', (req, res) =>
                             }
                         }
                     }
-                    else if (splitMessage[0] === 'turn' && parseInt(splitMessage[1]) == currentPlayer && cellColors[splitMessage[2]][splitMessage[3]] == currentPlayer)
+                    else if (splitMessage[0] === 'turn' && parseInt(splitMessage[1]) == currentPlayer && cellColors[parseInt(splitMessage[2])][parseInt(splitMessage[3])] == currentPlayer)
                     {
                         makeTurn(parseInt(splitMessage[2]), parseInt(splitMessage[3]));
                         res.write("wait");
