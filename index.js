@@ -17,7 +17,7 @@ let firstTurnCompleted = false;
 const firstTurnTerminated = [];
 let allFirstTurnsTerminated = false;
 let firstTurnData = "makefirstturn:";
-//1
+
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
@@ -87,6 +87,7 @@ server.on('request', (req, res) =>
                                 res.end();
                                 dataSent[parseInt(splitMessage[1])] = true;
                                 let foundFalse = false;
+                                console.log("sent first turn to " + splitMessage[1]);
                                 for (let i = 0; i < dataSent.length; ++i)
                                 {
                                     if (!dataSent[i])
