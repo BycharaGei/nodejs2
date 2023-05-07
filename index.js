@@ -17,7 +17,7 @@ let firstTurnCompleted = false;
 const firstTurnTerminated = [];
 let allFirstTurnsTerminated = false;
 let firstTurnData = "makefirstturn:";
-//
+
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
@@ -121,12 +121,14 @@ server.on('request', (req, res) =>
                                 {
                                     currentPlayer = 0;
                                     firstTurnCompleted = true;
+                                    console.log("all first turns terminated");
                                 }
                                 else
                                 {
                                     firstTurnTerminated[parseInt(splitMessage[1])] = true;
                                     res.write("firstturnsover");
                                     res.end();
+                                    console.log("terminated first turn " + splitMessage[1]);
                                     let foundFalse = false;
                                     for (let i = 0; i < firstTurnTerminated.length; ++i)
                                     {
