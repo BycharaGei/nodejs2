@@ -17,7 +17,7 @@ let firstTurnCompleted = false;
 const firstTurnTerminated = [];
 let allFirstTurnsTerminated = false;
 let firstTurnData = "makefirstturn:";
-//
+
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
@@ -369,7 +369,7 @@ function makeTurn(row, column)
     for (let i = 0; i < activePlayers.length; ++i)
     {
         currentPlayer++;
-        if (currentPlayer = activePlayers.length)
+        if (currentPlayer == activePlayers.length)
         {
             currentPlayer = 0;
         }
