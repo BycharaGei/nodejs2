@@ -187,6 +187,11 @@ server.on('request', (req, res) =>
                         res.write("wait");
                         res.end();
                     }
+                    else
+                    {
+                        res.write("wait");
+                        res.end();
+                    }
                 }
             }
             else
