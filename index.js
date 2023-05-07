@@ -17,7 +17,7 @@ let firstTurnCompleted = false;
 const firstTurnTerminated = [];
 let allFirstTurnsTerminated = false;
 let firstTurnData = "makefirstturn:";
-
+//
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
