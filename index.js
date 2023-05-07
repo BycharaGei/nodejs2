@@ -117,7 +117,7 @@ server.on('request', (req, res) =>
                             }
                             else if (currentPlayer == activePlayers.length)
                             {
-                                if (allFirstTurnsTerminated)
+                                /*if (allFirstTurnsTerminated)
                                 {
                                     currentPlayer = 0;
                                     firstTurnCompleted = true;
@@ -141,7 +141,30 @@ server.on('request', (req, res) =>
                                     if (!foundFalse)
                                     {
                                         allFirstTurnsTerminated = true;
+                                        currentPlayer = 0;
+                                        firstTurnCompleted = true;
+                                        console.log("all first turns terminated");
                                     }
+                                }*/
+                                firstTurnTerminated[parseInt(splitMessage[1])] = true;
+                                res.write("firstturnsover");
+                                res.end();
+                                console.log("terminated first turn " + splitMessage[1]);
+                                let foundFalse = false;
+                                for (let i = 0; i < firstTurnTerminated.length; ++i)
+                                {
+                                    if (!firstTurnTerminated[i])
+                                    {
+                                        foundFalse = true;
+                                        break;
+                                    }
+                                }
+                                if (!foundFalse)
+                                {
+                                    allFirstTurnsTerminated = true;
+                                    currentPlayer = 0;
+                                    firstTurnCompleted = true;
+                                    console.log("all first turns terminated");
                                 }
                             }
                             else
