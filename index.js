@@ -73,7 +73,7 @@ server.on('request', (req, res) =>
                             }
                         }
                     }
-                    else if (splitMessage[0] === 'turn' && parseInt(splitMessage[1]) == currentPlayer)
+                    else if (splitMessage[0] === 'turn' && parseInt(splitMessage[1]) == currentPlayer && cellColors[splitMessage[2]][splitMessage[3]] == currentPlayer)
                     {
                         makeTurn(parseInt(splitMessage[2]), parseInt(splitMessage[3]));
                         res.write("wait");
@@ -337,12 +337,14 @@ function makeTurn(row, column)
                     if (cellColors[j][k] == i)
                     {
                         count++;
+                        break;
                     }
                 }
             }
             if (count == 0)
             {
                 activePlayers[i] = false;
+                console.log("set to inactive " + i);
             }
         }
     }
@@ -369,8 +371,10 @@ function makeTurn(row, column)
         {
             currentPlayer = 0;
         }
+        console.log("changed current player to " + currentPlayer);
         if (activePlayers[currentPlayer])
         {
+            console.log("active player found " + currentPlayer);
             break;
         }
     }
