@@ -18,7 +18,7 @@ let allFirstTurnsTerminated = false;
 let firstTurnData = "makefirstturn:";
 let resetting = false;
 const resetted = [];
-//
+
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
@@ -36,7 +36,7 @@ server.on('request', (req, res) =>
                 if (parseInt(splitMessage[1]) != host)
                 {
                     console.log("resetted " + splitMessage[1]);
-                    res.write("resetplayer");
+                    res.write("reset");
                     res.end();
                 }
                 resetted[parseInt(splitMessage[1])] = true;
