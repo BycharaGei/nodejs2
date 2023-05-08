@@ -18,7 +18,7 @@ let allFirstTurnsTerminated = false;
 let firstTurnData = "makefirstturn:";
 let resetting = false;
 const resetted = [];
-//
+
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
@@ -60,6 +60,40 @@ server.on('request', (req, res) =>
                     resetted.push(false);
                     host = 0;
                     resetting = false;
+                }
+            }
+            else if (splitMessage[0] === 'host')
+            {
+                if (splitMessage[1] === 'reset' && parseInt(splitMessage[2]) == host)
+                {
+                    console.log("resetting");
+                    res.write("resetting");
+                    res.end();
+                    resetting = true;
+                    resetted[currentPlayer] = true;
+                }
+                else if (splitMessage[1] === 'deactivate' && parseInt(splitMessage[2]) == host)
+                {
+                    activePlayers[parseInt(splitMessage[3])] = false;
+                    if (currentPlayer == parseInt(splitMessage[3]))
+                    {
+                        for (let i = 0; i < activePlayers.length; ++i)
+                        {
+                            currentPlayer++;
+                            if (currentPlayer == activePlayers.length)
+                            {
+                                currentPlayer = 0;
+                            }
+                            if (activePlayers[currentPlayer])
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+                else if (splitMessage[1] === 'activate' && parseInt(splitMessage[2]) == host)
+                {
+                    activePlayers[parseInt(splitMessage[3])] = true;
                 }
             }
             else if (gameStarted)
@@ -255,35 +289,6 @@ server.on('request', (req, res) =>
                         firstTurnData = "makefirstturn:";
                         res.write(currentPlayer.toString());
                         res.end();
-                    }
-                    else if (splitMessage[1] === 'reset' && parseInt(splitMessage[2]) == host)
-                    {
-                        console.log("resetting");
-                        resetting = true;
-                        resetted[currentPlayer] = true;
-                    }
-                    else if (splitMessage[1] === 'deactivate' && parseInt(splitMessage[2]) == host)
-                    {
-                        activePlayers[parseInt(splitMessage[3])] = false;
-                        if (currentPlayer == parseInt(splitMessage[3]))
-                        {
-                            for (let i = 0; i < activePlayers.length; ++i)
-                            {
-                                currentPlayer++;
-                                if (currentPlayer == activePlayers.length)
-                                {
-                                    currentPlayer = 0;
-                                }
-                                if (activePlayers[currentPlayer])
-                                {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    else if (splitMessage[1] === 'activate' && parseInt(splitMessage[2]) == host)
-                    {
-                        activePlayers[parseInt(splitMessage[3])] = true;
                     }
                 }
                 if (splitMessage[0] === 'waitingfirstturn')
