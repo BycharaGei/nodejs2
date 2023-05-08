@@ -18,7 +18,7 @@ let allFirstTurnsTerminated = false;
 let firstTurnData = "makefirstturn:";
 let resetting = false;
 const resetted = [];
-//
+
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
@@ -60,6 +60,7 @@ server.on('request', (req, res) =>
                     resetted.push(false);
                     host = 0;
                     resetting = false;
+                    gameStarted = false;
                 }
             }
             else if (splitMessage[0] === 'host')
