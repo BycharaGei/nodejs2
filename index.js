@@ -18,7 +18,7 @@ let allFirstTurnsTerminated = false;
 let firstTurnData = "makefirstturn:";
 let resetting = false;
 const resetted = [];
-
+//
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
