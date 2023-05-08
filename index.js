@@ -258,6 +258,7 @@ server.on('request', (req, res) =>
                     }
                     else if (splitMessage[1] === 'reset' && parseInt(splitMessage[2]) == host)
                     {
+                        console.log("resetting");
                         resetting = true;
                         resetted[currentPlayer] = true;
                     }
