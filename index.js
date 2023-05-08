@@ -64,7 +64,18 @@ server.on('request', (req, res) =>
             }
             else if (splitMessage[0] === 'host')
             {
-                if (splitMessage[1] === 'reset' && parseInt(splitMessage[2]) == host)
+                if (splitMessage[1] === 'start' && parseInt(splitMessage[2]) == host && !resetting)
+                {
+                    console.log("startet");
+                    gameStarted = true;
+                    firstTurnCompleted = false;
+                    allFirstTurnsTerminated = false;
+                    currentPlayer = 0;
+                    firstTurnData = "makefirstturn:";
+                    res.write(currentPlayer.toString());
+                    res.end();
+                }
+                else if (splitMessage[1] === 'reset' && parseInt(splitMessage[2]) == host)
                 {
                     console.log("resetting");
                     res.write("resetting");
@@ -273,21 +284,6 @@ server.on('request', (req, res) =>
                     else
                     {
                         res.write("fail");
-                        res.end();
-                    }
-                }
-                if (splitMessage[0] === 'host')
-                {
-                    console.log("host");
-                    if (splitMessage[1] === 'start' && parseInt(splitMessage[2]) == host && !resetting)
-                    {
-                        console.log("startet");
-                        gameStarted = true;
-                        firstTurnCompleted = false;
-                        allFirstTurnsTerminated = false;
-                        currentPlayer = 0;
-                        firstTurnData = "makefirstturn:";
-                        res.write(currentPlayer.toString());
                         res.end();
                     }
                 }
