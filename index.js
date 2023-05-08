@@ -35,6 +35,7 @@ server.on('request', (req, res) =>
             {
                 if (parseInt(splitMessage[1]) != host)
                 {
+                    console.log("resetted " + splitMessage[1]);
                     res.write("resetplayer");
                     res.end();
                 }
