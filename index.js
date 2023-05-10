@@ -85,7 +85,7 @@ server.on('request', (req, res) =>
                     allFirstTurnsTerminated = false;
                     currentPlayer = 0;
                     firstTurnData = "makefirstturn:";
-                    res.write(activePlayers.length);
+                    res.write(activePlayers.length.toString());
                     res.end();
                 }
                 else if (splitMessage[1] === 'reset' && parseInt(splitMessage[2]) == host)
