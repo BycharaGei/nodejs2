@@ -22,7 +22,7 @@ let firstTurnCompleted = false;
 let firstTurnData = "makefirstturn:";
 const reconnectionDataRequired = [];
 const reconnectionDataRequiredSpectators = [];
-//
+//1
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
