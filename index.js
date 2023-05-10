@@ -7,6 +7,7 @@ const activePlayers = [];
 let host = -1;
 let hostNumber = -1;
 let currentPlayer = 0;
+let currentSpectator = -1;
 let gameID = getRandomInt(1000000000);
 const rows = 15;
 const columns = 15;
@@ -15,10 +16,12 @@ const cellColors = new Array(rows).fill().map(() => new Array(columns).fill(-1))
 let gameStarted = false;
 const dataToSend = [];
 const lastSentData = [];
+const lastSentDataSpectators = [];
 let firstTurnCompleted = false;
 let firstTurnData = "makefirstturn:";
+const reconnectionDataRequired = [];
+const reconnectionDataRequiredSpectators = [];
 //add check in connection if game startet, if so load all cells as response;
-//add leave host button (full game reset);
 
 server.on('request', (req, res) => 
 {
@@ -34,24 +37,92 @@ server.on('request', (req, res) =>
             const splitMessage = message.split(":");
             if (splitMessage[0] === "connect")
             {
-                if (splitMessage[1] === 'player') 
+                if (gameStarted)
+                {
+                    if (splitMessage[1] === 'player')
+                    {
+                        let foundReconnection = false;
+                        let newPlayer = currentSpectator--;
+                        for (let i = 0; i < activePlayers.length; ++i)
+                        {
+                            if (!activePlayers[i])
+                            {
+                                for (let k = 0; k < rows; ++k)
+                                {
+                                    for (let j = 0; j < columns; ++j)
+                                    {
+                                        if (cellColors[k][j] == i)
+                                        {
+                                            foundReconnection = true;
+                                            newPlayer = i;
+                                            currentSpectator++;
+                                            break;
+                                        }
+                                    }
+                                    if (foundReconnection)
+                                    {
+                                        break;
+                                    }
+                                }
+                                if (foundReconnection)
+                                {
+                                    break;
+                                }
+                            }
+                        }
+                        if (foundReconnection)
+                        {
+                            activePlayers[newPlayer] = true;
+                            reconnectionDataRequired[newPlayer] = true;
+                            res.write("success:" + gameID + ":" + newPlayer);
+                            res.end();
+                        }
+                        else
+                        {
+                            lastSentDataSpectators.push(dataToSend.length);
+                            reconnectionDataRequiredSpectators.push(true);
+                            res.write("success:" + gameID + ":" + newPlayer);
+                            res.end();
+                        }
+                    }
+                    else if (splitMessage[1] === 'host')
+                    {
+                        let hostPassword = fs.readFileSync('host.txt', 'utf8').trim();
+                        if (splitMessage[2] === hostPassword)
+                        {
+                            reconnectionDataRequired[hostNumber] = true;
+                            host = getRandomInt(1000000000);
+                            res.write("success:" + gameID + ":" + hostNumber + ":" + host);
+                            res.end();
+                        }
+                        else
+                        {
+                            res.write("fail");
+                            res.end();
+                        }
+                    }
+                }
+                else if (splitMessage[1] === 'player') 
                 {
                     console.log('connect player');
                     if (activePlayers.length - (host == -1 ? 0 : 1) < 3)
                     {
                         dataSent.push(false);
                         activePlayers.push(true);
+                        reconnectionDataRequired.push(false);
                         lastSentData.push(0);
                         res.write("success:" + gameID + ":" + (activePlayers.length - 1));
                         res.end();
                     }
                     else
                     {
-                        res.write("fail");
+                        lastSentDataSpectators.push(0);
+                        reconnectionDataRequiredSpectators.push(false);
+                        res.write("success:" + gameID + ":" + currentSpectator--);
                         res.end();
                     }
                 }
-                if (splitMessage[1] === 'host') 
+                else if (splitMessage[1] === 'host') 
                 {
                     console.log('connect host');
                     let hostPassword = fs.readFileSync('host.txt', 'utf8').trim();
@@ -61,6 +132,7 @@ server.on('request', (req, res) =>
                         {
                             dataSent.push(false);
                             activePlayers.push(true);
+                            reconnectionDataRequired.push(false);
                             lastSentData.push(0);
                             hostNumber = (activePlayers.length - 1);
                         }
@@ -99,6 +171,10 @@ server.on('request', (req, res) =>
                     dataSent.push(false);
                     lastSentData.length = 0;
                     lastSentData.push(0);
+                    reconnectionDataRequired.length = 0;
+                    reconnectionDataRequired.push(false);
+                    reconnectionDataRequiredSpectators.length = 0;
+                    currentSpectator = -1;
                     dataToSend.length = 0;
                     gameStarted = false;
                     firstTurnCompleted = false;
@@ -127,6 +203,10 @@ server.on('request', (req, res) =>
                             currentPlayer++;
                             if (currentPlayer == activePlayers.length)
                             {
+                                if (!firstTurnCompleted)
+                                {
+                                    firstTurnCompleted = true;
+                                }
                                 currentPlayer = 0;
                             }
                             if (activePlayers[currentPlayer])
@@ -153,6 +233,9 @@ server.on('request', (req, res) =>
                     dataSent.length = 0;
                     activePlayers.length = 0;
                     currentPlayer = 0;
+                    reconnectionDataRequired.length = 0;
+                    reconnectionDataRequiredSpectators.length = 0;
+                    currentSpectator = -1;
                     gameID = getRandomInt(1000000000);
                     for (let i = 0; i < rows; ++i)
                     {
@@ -194,7 +277,35 @@ server.on('request', (req, res) =>
                 {
                     if (splitMessage[0] === 'waitingturn')
                     {
-                        if (lastSentData[parseInt(splitMessage[2])] < dataToSend.length)
+                        if (parseInt(splitMessage[2]) < 0)
+                        {
+                            let index = parseInt(splitMessage[2]) * (-1) - 1;
+                            if (reconnectionDataRequiredSpectators[index])
+                            {
+                                reconnectionDataRequiredSpectators[index] = false;
+                                lastSentDataSpectators[index] = dataToSend.length;
+                                res.write(getReconnectionData());
+                                res.end();
+                            }
+                            else if (lastSentDataSpectators[index] < dataToSend.length)
+                            {
+                                res.write(dataToSend[lastSentDataSpectators[index]++]);
+                                res.end();
+                            }
+                            else
+                            {
+                                res.write("wait");
+                                res.end();
+                            }
+                        }
+                        else if (reconnectionDataRequired[parseInt(splitMessage[2])])
+                        {
+                            reconnectionDataRequired[parseInt(splitMessage[2])] = false;
+                            lastSentData[parseInt(splitMessage[2])] = dataToSend.length;
+                            res.write(getReconnectionData());
+                            res.end();
+                        }
+                        else if (lastSentData[parseInt(splitMessage[2])] < dataToSend.length)
                         {
                             res.write(dataToSend[lastSentData[parseInt(splitMessage[2])]++]);
                             res.end();
@@ -229,7 +340,35 @@ server.on('request', (req, res) =>
                 {
                     if (splitMessage[0] === 'waitingturn')
                     {
-                        if (lastSentData[parseInt(splitMessage[2])] < dataToSend.length)
+                        if (parseInt(splitMessage[2]) < 0)
+                        {
+                            let index = parseInt(splitMessage[2]) * (-1) - 1;
+                            if (reconnectionDataRequiredSpectators[index])
+                            {
+                                reconnectionDataRequiredSpectators[index] = false;
+                                lastSentDataSpectators[index] = dataToSend.length;
+                                res.write(getReconnectionData());
+                                res.end();
+                            }
+                            else if (lastSentDataSpectators[index] < dataToSend.length)
+                            {
+                                res.write(dataToSend[lastSentDataSpectators[index]++]);
+                                res.end();
+                            }
+                            else
+                            {
+                                res.write("wait");
+                                res.end();
+                            }
+                        }
+                        else if (reconnectionDataRequired[parseInt(splitMessage[2])])
+                        {
+                            reconnectionDataRequired[parseInt(splitMessage[2])] = false;
+                            lastSentData[parseInt(splitMessage[2])] = dataToSend.length;
+                            res.write(getReconnectionData());
+                            res.end();
+                        }
+                        else if (lastSentData[parseInt(splitMessage[2])] < dataToSend.length)
                         {
                             res.write(dataToSend[lastSentData[parseInt(splitMessage[2])]++]);
                             res.end();
@@ -247,6 +386,24 @@ server.on('request', (req, res) =>
                                 res.end();
                             }
                         }
+                        /*if (lastSentData[parseInt(splitMessage[2])] < dataToSend.length)
+                        {
+                            res.write(dataToSend[lastSentData[parseInt(splitMessage[2])]++]);
+                            res.end();
+                        }
+                        else
+                        {
+                            if (currentPlayer == parseInt(splitMessage[2]))
+                            {
+                                res.write(firstTurnData);
+                                res.end();
+                            }
+                            else
+                            {
+                                res.write("wait");
+                                res.end();
+                            }
+                        }*/
                     }
                     else if (splitMessage[0] === 'firstturn' && parseInt(splitMessage[2]) == currentPlayer)
                     {
@@ -387,4 +544,20 @@ function makeTurn(row, column)
 function getRandomInt(max) 
 {
     return Math.floor(Math.random() * max);
+}
+
+function getReconnectionData()
+{
+    let newData = "setcells:";
+    for (let i = 0; i < rows; ++i)
+    {
+        for (let j = 0; j < columns; ++j)
+        {
+            if (cellValues[i][j] > 0)
+            {
+                newData += i.toString() + "," + j.toString() + "," + cellValues[i][j].toString() + "," + cellColors[i][j].toString() + ";";
+            }
+        }
+    }
+    return newData;
 }
