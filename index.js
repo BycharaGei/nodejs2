@@ -56,17 +56,7 @@ server.on('request', (req, res) =>
                 if (splitMessage[1] === 'host') 
                 {
                     console.log('connect host');
-                    let hostPassword;
-                    fs.readFile('host.txt', 'utf8', (err, data) => 
-                    {
-                        if (err) 
-                        {
-                          console.error('Error reading file:', err);
-                          return;
-                        }
-                        hostPassword = data.trim().toString();
-                        console.log(hostPassword + " " + splitMessage[2]);
-                    });
+                    let hostPassword = fs.readFileSync('host.txt', 'utf8').trim();
                     if (hostPassword == "1234")
                     {
                         console.log("equal1");
