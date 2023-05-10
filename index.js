@@ -1,11 +1,13 @@
 const http = require('http');
 const server = http.createServer();
+const fs = require('fs');
 const PORT = 3000;
 const dataSent = [];
 const activePlayers = [];
 let host = -1;
+let hostNumber = -1;
 let currentPlayer = 0;
-let gameID = 0;
+let gameID = getRandomInt(1000000000);
 const rows = 15;
 const columns = 15;
 const cellValues = new Array(rows).fill().map(() => new Array(columns).fill(0));
@@ -60,8 +62,9 @@ server.on('request', (req, res) =>
                         activePlayers.push(true);
                         firstTurnTerminated.push(false);
                         lastSentData.push(0);
-                        host = (activePlayers.length - 1);
-                        res.write("success:" + gameID + ":" + (activePlayers.length - 1));
+                        host = getRandomInt(1000000000);
+                        hostNumber = (activePlayers.length - 1);
+                        res.write("success:" + gameID + ":" + (activePlayers.length - 1) + ":" + host);
                         res.end();
                     }
                     else
@@ -82,15 +85,13 @@ server.on('request', (req, res) =>
                     allFirstTurnsTerminated = false;
                     currentPlayer = 0;
                     firstTurnData = "makefirstturn:";
-                    res.write(currentPlayer.toString());
+                    res.write(activePlayers.length);
                     res.end();
                 }
                 else if (splitMessage[1] === 'reset' && parseInt(splitMessage[2]) == host)
                 {
                     console.log("resetting");
-                    res.write("resetting");
-                    res.end();
-                    gameID++;
+                    gameID = getRandomInt(1000000000);
                     activePlayers.length = 0;
                     activePlayers.push(true);
                     dataSent.length = 0;
@@ -100,11 +101,11 @@ server.on('request', (req, res) =>
                     lastSentData.length = 0;
                     lastSentData.push(0);
                     dataToSend.length = 0;
-                    host = 0;
                     gameStarted = false;
                     firstTurnCompleted = false;
                     dataSendingRequired = false;
                     currentPlayer = 0;
+                    hostNumber = 0;
                     firstTurnData = "makefirstturn:";
                     for (let i = 0; i < rows; ++i)
                     {
@@ -114,6 +115,8 @@ server.on('request', (req, res) =>
                             cellColors[i][j] = -1;
                         }
                     }
+                    res.write("resetting:" + gameID);
+                    res.end();
                 }
                 else if (splitMessage[1] === 'deactivate' && parseInt(splitMessage[2]) == host)
                 {
@@ -338,4 +341,9 @@ function makeTurn(row, column)
             break;
         }
     }
+}
+
+function getRandomInt(max) 
+{
+    return Math.floor(Math.random() * max);
 }
