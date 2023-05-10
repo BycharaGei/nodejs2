@@ -16,7 +16,7 @@ let dataToSend = null;
 let firstTurnCompleted = false;
 const firstTurnTerminated = [];
 let firstTurnData = "makefirstturn:";
-//add game id to requests
+//
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
