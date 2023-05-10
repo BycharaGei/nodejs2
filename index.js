@@ -56,7 +56,13 @@ server.on('request', (req, res) =>
                 if (splitMessage[1] === 'host') 
                 {
                     console.log('connect host');
-                    if (host == -1)
+                    let hostPassword;
+                    fs.readFile('/host.txt', 'utf8', (err, data) => 
+                    {
+                        hostPassword = data;
+                        console.log(hostPassword);
+                    });
+                    if (host == -1 && splitMessage[2] === hostPassword)
                     {
                         dataSent.push(false);
                         activePlayers.push(true);
