@@ -21,7 +21,6 @@ let firstTurnData = "makefirstturn:";
 //add check in connection if game startet, if so load all cells as response;
 //fix kick buttons;
 //add leave host button (full game reset);
-//1
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
@@ -58,18 +57,6 @@ server.on('request', (req, res) =>
                 {
                     console.log('connect host');
                     let hostPassword = fs.readFileSync('host.txt', 'utf8').trim();
-                    if (hostPassword == "1234")
-                    {
-                        console.log("equal1");
-                    }
-                    if (splitMessage[2] == "1234")
-                    {
-                        console.log("equal2");
-                    }
-                    if (splitMessage[2] == hostPassword)
-                    {
-                        console.log("equal3");
-                    }
                     if (host == -1 && splitMessage[2] === hostPassword)
                     {
                         dataSent.push(false);
@@ -150,10 +137,14 @@ server.on('request', (req, res) =>
                             }
                         }
                     }
+                    res.write("success");
+                    res.end();
                 }
                 else if (splitMessage[1] === 'activate' && parseInt(splitMessage[2]) == host)
                 {
                     activePlayers[parseInt(splitMessage[3])] = true;
+                    res.write("success");
+                    res.end();
                 }
             }
             else if (parseInt(splitMessage[1]) != gameID)
