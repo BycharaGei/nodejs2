@@ -65,7 +65,7 @@ server.on('request', (req, res) =>
                           return;
                         }
                         hostPassword = data.trim();
-                        console.log('Host Password:', hostPassword);
+                        console.log(hostPassword + " " + splitMessage[2]);
                     });
                     if (host == -1 && splitMessage[2] === hostPassword)
                     {
