@@ -5,7 +5,7 @@ const dataSent = [];
 const activePlayers = [];
 let host = -1;
 let currentPlayer = 0;
-let gameID = -1;
+let gameID = 0;
 const rows = 15;
 const columns = 15;
 const cellValues = new Array(rows).fill().map(() => new Array(columns).fill(0));
@@ -15,10 +15,7 @@ let dataSendingRequired = false;
 let dataToSend = null;
 let firstTurnCompleted = false;
 const firstTurnTerminated = [];
-let allFirstTurnsTerminated = false;
 let firstTurnData = "makefirstturn:";
-let resetting = false;
-const resetted = [];
 //add game id to requests
 server.on('request', (req, res) => 
 {
@@ -37,7 +34,7 @@ server.on('request', (req, res) =>
                 if (splitMessage[1] === 'player') 
                 {
                     console.log('connect player');
-                    if (activePlayers.length - (host == -1 ? 0 : 1) < 3 && !resetting)
+                    if (activePlayers.length - (host == -1 ? 0 : 1) < 3)
                     {
                         dataSent.push(false);
                         activePlayers.push(true);
@@ -104,6 +101,7 @@ server.on('request', (req, res) =>
             }*/
             else if (splitMessage[0] === 'host')
             {
+                console.log(message + " gameID = " + gameID + ", host = " + host);
                 if (splitMessage[1] === 'start' && parseInt(splitMessage[2]) == host)
                 {
                     console.log("startet");
@@ -129,6 +127,18 @@ server.on('request', (req, res) =>
                     firstTurnTerminated.push(false);
                     host = 0;
                     gameStarted = false;
+                    firstTurnCompleted = false;
+                    dataSendingRequired = false;
+                    currentPlayer = 0;
+                    firstTurnData = "makefirstturn:";
+                    for (let i = 0; i < rows; ++i)
+                    {
+                        for (let j = 0; j < columns; ++j)
+                        {
+                            cellValues[i][j] = 0;
+                            cellColors[i][j] = -1;
+                        }
+                    }
                 }
                 else if (splitMessage[1] === 'deactivate' && parseInt(splitMessage[2]) == host)
                 {
@@ -154,7 +164,7 @@ server.on('request', (req, res) =>
                     activePlayers[parseInt(splitMessage[3])] = true;
                 }
             }
-            else if (parseInt(splitMessage[1]) != gameID && parseInt(splitMessage[2]) != host)
+            else if (parseInt(splitMessage[1]) != gameID)
             {
                 res.write("reset");
                 res.end();
