@@ -168,11 +168,19 @@ server.on('request', (req, res) =>
                     firstTurnCompleted = false;
                     firstTurnData = "makefirstturn:";
                 }
-                else if (splitMessage[1] === 'validate' && parseInt(splitMessage[2]) != host)
+                else if (splitMessage[1] === 'validate')
                 {
-                    res.write("reset");
-                    res.end();
-                    console.log("close host");
+                    if (parseInt(splitMessage[2]) != host)
+                    {
+                        res.write("reset");
+                        res.end();
+                        console.log("close host");
+                    }
+                    else
+                    {
+                        res.write("valid");
+                        res.end();
+                    }
                 }
             }
             else if (parseInt(splitMessage[1]) != gameID)
