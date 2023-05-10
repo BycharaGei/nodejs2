@@ -16,12 +16,10 @@ let gameStarted = false;
 const dataToSend = [];
 const lastSentData = [];
 let firstTurnCompleted = false;
-const firstTurnTerminated = [];
 let firstTurnData = "makefirstturn:";
 //add check in connection if game startet, if so load all cells as response;
-//fix kick buttons;
 //add leave host button (full game reset);
-//
+
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
@@ -43,7 +41,6 @@ server.on('request', (req, res) =>
                     {
                         dataSent.push(false);
                         activePlayers.push(true);
-                        firstTurnTerminated.push(false);
                         lastSentData.push(0);
                         res.write("success:" + gameID + ":" + (activePlayers.length - 1));
                         res.end();
@@ -62,7 +59,6 @@ server.on('request', (req, res) =>
                     {
                         dataSent.push(false);
                         activePlayers.push(true);
-                        firstTurnTerminated.push(false);
                         lastSentData.push(0);
                         host = getRandomInt(1000000000);
                         hostNumber = (activePlayers.length - 1);
@@ -98,8 +94,6 @@ server.on('request', (req, res) =>
                     activePlayers.push(true);
                     dataSent.length = 0;
                     dataSent.push(false);
-                    firstTurnTerminated.length = 0;
-                    firstTurnTerminated.push(false);
                     lastSentData.length = 0;
                     lastSentData.push(0);
                     dataToSend.length = 0;
@@ -145,6 +139,35 @@ server.on('request', (req, res) =>
                 {
                     activePlayers[parseInt(splitMessage[3])] = true;
                     res.write("success");
+                    res.end();
+                }
+                else if (splitMessage[1] === 'leave' && parseInt(splitMessage[2]) == host)
+                {
+                    res.write("leave");
+                    res.end();
+                    host = -1;
+                    hostNumber = -1;
+                    dataSent.length = 0;
+                    activePlayers.length = 0;
+                    currentPlayer = 0;
+                    gameID = getRandomInt(1000000000);
+                    for (let i = 0; i < rows; ++i)
+                    {
+                        for (let j = 0; j < columns; ++j)
+                        {
+                            cellValues[i][j] = 0;
+                            cellColors[i][j] = -1;
+                        }
+                    }
+                    gameStarted = false;
+                    dataToSend.length = 0;
+                    lastSentData.length = 0;
+                    firstTurnCompleted = false;
+                    firstTurnData = "makefirstturn:";
+                }
+                else if (splitMessage[1] === 'validate' && parseInt(splitMessage[2]) != host)
+                {
+                    res.write("reset");
                     res.end();
                 }
             }
