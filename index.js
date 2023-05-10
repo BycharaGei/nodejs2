@@ -22,7 +22,7 @@ let firstTurnCompleted = false;
 let firstTurnData = "makefirstturn:";
 const reconnectionDataRequired = [];
 const reconnectionDataRequiredSpectators = [];
-//1
+
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
@@ -152,7 +152,10 @@ server.on('request', (req, res) =>
             }
             else if (splitMessage[0] === 'host')
             {
-                console.log(message + " gameID = " + gameID + ", host = " + host);
+                if (splitMessage[1] != 'validate')
+                {
+                    console.log(message + " gameID = " + gameID + ", host = " + host);
+                }
                 if (splitMessage[1] === 'start' && parseInt(splitMessage[2]) == host)
                 {
                     if (!gameStarted)
