@@ -5,6 +5,7 @@ const dataSent = [];
 const activePlayers = [];
 let host = -1;
 let currentPlayer = 0;
+let gameID = -1;
 const rows = 15;
 const columns = 15;
 const cellValues = new Array(rows).fill().map(() => new Array(columns).fill(0));
@@ -18,7 +19,7 @@ let allFirstTurnsTerminated = false;
 let firstTurnData = "makefirstturn:";
 let resetting = false;
 const resetted = [];
-//123456
+//add game id to requests
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
@@ -31,7 +32,45 @@ server.on('request', (req, res) =>
         {
             const message = Buffer.concat(body).toString();
             const splitMessage = message.split(":");
-            if (resetting && splitMessage[0] != "connect")
+            if (splitMessage[0] === "connect")
+            {
+                if (splitMessage[1] === 'player') 
+                {
+                    console.log('connect player');
+                    if (activePlayers.length - (host == -1 ? 0 : 1) < 3 && !resetting)
+                    {
+                        dataSent.push(false);
+                        activePlayers.push(true);
+                        firstTurnTerminated.push(false);
+                        res.write("success:" + gameID + ":" + (activePlayers.length - 1));
+                        res.end();
+                    }
+                    else
+                    {
+                        res.write("fail");
+                        res.end();
+                    }
+                }
+                if (splitMessage[1] === 'host') 
+                {
+                    console.log('connect host');
+                    if (host == -1)
+                    {
+                        dataSent.push(false);
+                        activePlayers.push(true);
+                        firstTurnTerminated.push(false);
+                        host = (activePlayers.length - 1);
+                        res.write("success:" + gameID + ":" + (activePlayers.length - 1));
+                        res.end();
+                    }
+                    else
+                    {
+                        res.write("fail");
+                        res.end();
+                    }
+                }
+            }
+            /*else if (resetting && splitMessage[0] != "connect")
             {
                 if (parseInt(splitMessage[1]) != host)
                 {
@@ -62,10 +101,10 @@ server.on('request', (req, res) =>
                     resetting = false;
                     gameStarted = false;
                 }
-            }
+            }*/
             else if (splitMessage[0] === 'host')
             {
-                if (splitMessage[1] === 'start' && parseInt(splitMessage[2]) == host && !resetting)
+                if (splitMessage[1] === 'start' && parseInt(splitMessage[2]) == host)
                 {
                     console.log("startet");
                     gameStarted = true;
@@ -81,8 +120,15 @@ server.on('request', (req, res) =>
                     console.log("resetting");
                     res.write("resetting");
                     res.end();
-                    resetting = true;
-                    resetted[currentPlayer] = true;
+                    gameID++;
+                    activePlayers.length = 0;
+                    activePlayers.push(true);
+                    dataSent.length = 0;
+                    dataSent.push(false);
+                    firstTurnTerminated.length = 0;
+                    firstTurnTerminated.push(false);
+                    host = 0;
+                    gameStarted = false;
                 }
                 else if (splitMessage[1] === 'deactivate' && parseInt(splitMessage[2]) == host)
                 {
@@ -108,6 +154,11 @@ server.on('request', (req, res) =>
                     activePlayers[parseInt(splitMessage[3])] = true;
                 }
             }
+            else if (parseInt(splitMessage[1]) != gameID && parseInt(splitMessage[2]) != host)
+            {
+                res.write("reset");
+                res.end();
+            }
             else if (gameStarted)
             {
                 if (firstTurnCompleted)
@@ -116,11 +167,11 @@ server.on('request', (req, res) =>
                     {
                         if (dataSendingRequired)
                         {
-                            if (!dataSent[parseInt(splitMessage[1])])
+                            if (!dataSent[parseInt(splitMessage[2])])
                             {
                                 res.write(dataToSend);
                                 res.end();
-                                dataSent[parseInt(splitMessage[1])] = true;
+                                dataSent[parseInt(splitMessage[2])] = true;
                                 let foundFalse = false;
                                 for (let i = 0; i < dataSent.length; ++i)
                                 {
@@ -135,10 +186,15 @@ server.on('request', (req, res) =>
                                     dataToSend = null;
                                 }
                             }
+                            else
+                            {
+                                res.write("wait");
+                                res.end();
+                            }
                         }
                         else
                         {
-                            if (currentPlayer == parseInt(splitMessage[1]))
+                            if (currentPlayer == parseInt(splitMessage[2]))
                             {
                                 res.write("maketurn");
                                 res.end();
@@ -150,15 +206,20 @@ server.on('request', (req, res) =>
                             }
                         }
                     }
-                    else if (splitMessage[0] === 'turn' && parseInt(splitMessage[1]) == currentPlayer && cellColors[parseInt(splitMessage[2])][parseInt(splitMessage[3])] == currentPlayer)
+                    else if (splitMessage[0] === 'turn' && parseInt(splitMessage[2]) == currentPlayer && cellColors[parseInt(splitMessage[3])][parseInt(splitMessage[4])] == currentPlayer)
                     {
-                        makeTurn(parseInt(splitMessage[2]), parseInt(splitMessage[3]));
+                        makeTurn(parseInt(splitMessage[3]), parseInt(splitMessage[4]));
                         res.write("wait");
                         res.end();
                     }
                     else if(splitMessage[0] === 'waitingfirstturn')
                     {
                         res.write("firstturnsover");
+                        res.end();
+                    }
+                    else
+                    {
+                        res.write("wait");
                         res.end();
                     }
                 }
@@ -168,13 +229,13 @@ server.on('request', (req, res) =>
                     {
                         if (dataSendingRequired)
                         {
-                            if (!dataSent[parseInt(splitMessage[1])])
+                            if (!dataSent[parseInt(splitMessage[2])])
                             {
                                 res.write(dataToSend);
                                 res.end();
-                                dataSent[parseInt(splitMessage[1])] = true;
+                                dataSent[parseInt(splitMessage[2])] = true;
                                 let foundFalse = false;
-                                console.log("sent first turn to " + splitMessage[1]);
+                                console.log("sent first turn to " + splitMessage[2]);
                                 for (let i = 0; i < dataSent.length; ++i)
                                 {
                                     if (!dataSent[i])
@@ -189,20 +250,25 @@ server.on('request', (req, res) =>
                                     console.log("all first turn data sent");
                                 }
                             }
+                            else
+                            {
+                                res.write("wait");
+                                res.end();
+                            }
                         }
                         else
                         {
-                            if (currentPlayer == parseInt(splitMessage[1]))
+                            if (currentPlayer == parseInt(splitMessage[2]))
                             {
                                 res.write(firstTurnData);
                                 res.end();
                             }
                             else if (currentPlayer == activePlayers.length)
                             {
-                                firstTurnTerminated[parseInt(splitMessage[1])] = true;
+                                firstTurnTerminated[parseInt(splitMessage[2])] = true;
                                 res.write("firstturnsover");
                                 res.end();
-                                console.log("terminated first turn " + splitMessage[1]);
+                                console.log("terminated first turn " + splitMessage[2]);
                                 let foundFalse = false;
                                 for (let i = 0; i < firstTurnTerminated.length; ++i)
                                 {
@@ -227,12 +293,12 @@ server.on('request', (req, res) =>
                             }
                         }
                     }
-                    else if (splitMessage[0] === 'firstturn' && parseInt(splitMessage[1]) == currentPlayer)
+                    else if (splitMessage[0] === 'firstturn' && parseInt(splitMessage[2]) == currentPlayer)
                     {
-                        dataToSend = "setcells:" + splitMessage[2].toString() + "," + splitMessage[3].toString() + ",1," + currentPlayer.toString() + ";";
-                        firstTurnData += splitMessage[2].toString() + "," + splitMessage[3].toString() + ";";
-                        cellColors[parseInt(splitMessage[2])][parseInt(splitMessage[3])] = parseInt(splitMessage[1]);
-                        cellValues[parseInt(splitMessage[2])][parseInt(splitMessage[3])] = 1;
+                        dataToSend = "setcells:" + splitMessage[3].toString() + "," + splitMessage[4].toString() + ",1," + currentPlayer.toString() + ";";
+                        firstTurnData += splitMessage[3].toString() + "," + splitMessage[4].toString() + ";";
+                        cellColors[parseInt(splitMessage[3])][parseInt(splitMessage[4])] = parseInt(splitMessage[2]);
+                        cellValues[parseInt(splitMessage[3])][parseInt(splitMessage[4])] = 1;
                         currentPlayer++;
                         for (let i = 0; i < dataSent.length; ++i)
                         {
@@ -251,48 +317,8 @@ server.on('request', (req, res) =>
             }
             else
             {
-                if (message === 'connect:player') 
-                {
-                    console.log('connect player');
-                    if (activePlayers.length - (host == -1 ? 0 : 1) < 3 && !resetting)
-                    {
-                        dataSent.push(false);
-                        activePlayers.push(true);
-                        firstTurnTerminated.push(false);
-                        resetted.push(false);
-                        res.write("success:" + (activePlayers.length - 1));
-                        res.end();
-                    }
-                    else
-                    {
-                        res.write("fail");
-                        res.end();
-                    }
-                }
-                if (message === 'connect:host') 
-                {
-                    console.log('connect host');
-                    if (host == -1 && !resetting)
-                    {
-                        dataSent.push(false);
-                        activePlayers.push(true);
-                        firstTurnTerminated.push(false);
-                        resetted.push(false);
-                        host = (activePlayers.length - 1);
-                        res.write("success:" + (activePlayers.length - 1));
-                        res.end();
-                    }
-                    else
-                    {
-                        res.write("fail");
-                        res.end();
-                    }
-                }
-                if (splitMessage[0] === 'waitingfirstturn')
-                {
-                    res.write("wait");
-                    res.end();
-                }
+                res.write("wait");
+                res.end();
             }
         });
     }
