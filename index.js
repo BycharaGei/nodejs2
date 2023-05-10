@@ -4,6 +4,7 @@ const fs = require('fs');
 const PORT = 3000;
 const dataSent = [];
 const activePlayers = [];
+const deactivatedPlayers = [];
 let host = -1;
 let hostNumber = -1;
 let currentPlayer = 0;
@@ -109,6 +110,7 @@ server.on('request', (req, res) =>
                         dataSent.push(false);
                         activePlayers.push(true);
                         reconnectionDataRequired.push(false);
+                        deactivatedPlayers.push(false);
                         lastSentData.push(0);
                         res.write("success:" + gameID + ":" + (activePlayers.length - 1));
                         res.end();
@@ -132,6 +134,7 @@ server.on('request', (req, res) =>
                             dataSent.push(false);
                             activePlayers.push(true);
                             reconnectionDataRequired.push(false);
+                            deactivatedPlayers.push(false);
                             lastSentData.push(0);
                             hostNumber = (activePlayers.length - 1);
                         }
@@ -151,12 +154,15 @@ server.on('request', (req, res) =>
                 console.log(message + " gameID = " + gameID + ", host = " + host);
                 if (splitMessage[1] === 'start' && parseInt(splitMessage[2]) == host)
                 {
-                    console.log("startet");
-                    gameStarted = true;
-                    firstTurnCompleted = false;
-                    allFirstTurnsTerminated = false;
-                    currentPlayer = 0;
-                    firstTurnData = "makefirstturn:";
+                    if (!gameStarted)
+                    {
+                        console.log("startet");
+                        gameStarted = true;
+                        firstTurnCompleted = false;
+                        allFirstTurnsTerminated = false;
+                        currentPlayer = 0;
+                        firstTurnData = "makefirstturn:";
+                    }
                     res.write(activePlayers.length.toString());
                     res.end();
                 }
@@ -173,6 +179,8 @@ server.on('request', (req, res) =>
                     reconnectionDataRequired.length = 0;
                     reconnectionDataRequired.push(false);
                     reconnectionDataRequiredSpectators.length = 0;
+                    deactivatedPlayers.length = 0;
+                    deactivatedPlayers.push(false);
                     currentSpectator = -1;
                     dataToSend.length = 0;
                     gameStarted = false;
@@ -195,6 +203,10 @@ server.on('request', (req, res) =>
                 else if (splitMessage[1] === 'deactivate' && parseInt(splitMessage[2]) == host)
                 {
                     activePlayers[parseInt(splitMessage[3])] = false;
+                    if (parseInt(splitMessage[3]) != currentPlayer)
+                    {
+                        deactivatedPlayers[parseInt(splitMessage[3])] = true;
+                    }
                     if (currentPlayer == parseInt(splitMessage[3]))
                     {
                         for (let i = 0; i < activePlayers.length; ++i)
@@ -220,6 +232,7 @@ server.on('request', (req, res) =>
                 else if (splitMessage[1] === 'activate' && parseInt(splitMessage[2]) == host)
                 {
                     activePlayers[parseInt(splitMessage[3])] = true;
+                    deactivatedPlayers[parseInt(splitMessage[3])] = false;
                     res.write("success");
                     res.end();
                 }
@@ -234,6 +247,7 @@ server.on('request', (req, res) =>
                     currentPlayer = 0;
                     reconnectionDataRequired.length = 0;
                     reconnectionDataRequiredSpectators.length = 0;
+                    deactivatedPlayers.length = 0;
                     currentSpectator = -1;
                     gameID = getRandomInt(1000000000);
                     for (let i = 0; i < rows; ++i)
@@ -264,6 +278,12 @@ server.on('request', (req, res) =>
                         res.end();
                     }
                 }
+            }
+            else if (deactivatedPlayers[parseInt(splitMessage[2])] && parseInt(splitMessage[2]) != hostNumber)
+            {
+                deactivatedPlayers[parseInt(splitMessage[2])] = false;
+                res.write("reset");
+                res.end();
             }
             else if (parseInt(splitMessage[1]) != gameID)
             {
