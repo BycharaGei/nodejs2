@@ -55,14 +55,17 @@ server.on('request', (req, res) =>
                 {
                     console.log('connect host');
                     let hostPassword = fs.readFileSync('host.txt', 'utf8').trim();
-                    if (host == -1 && splitMessage[2] === hostPassword)
+                    if (splitMessage[2] === hostPassword)
                     {
-                        dataSent.push(false);
-                        activePlayers.push(true);
-                        lastSentData.push(0);
+                        if (hostNumber == -1)
+                        {
+                            dataSent.push(false);
+                            activePlayers.push(true);
+                            lastSentData.push(0);
+                            hostNumber = (activePlayers.length - 1);
+                        }
                         host = getRandomInt(1000000000);
-                        hostNumber = (activePlayers.length - 1);
-                        res.write("success:" + gameID + ":" + (activePlayers.length - 1) + ":" + host);
+                        res.write("success:" + gameID + ":" + hostNumber + ":" + host);
                         res.end();
                     }
                     else
