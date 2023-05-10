@@ -166,7 +166,7 @@ server.on('request', (req, res) =>
                     }
                     else
                     {
-                        dataSendingRequired[hostNumber] = true;
+                        reconnectionDataRequired[hostNumber] = true;
                     }
                     res.write(activePlayers.length.toString());
                     res.end();
