@@ -71,7 +71,7 @@ server.on('request', (req, res) =>
                     {
                         console.log("equal1");
                     }
-                    if (splitMessage[2] == hostPassword)
+                    if (splitMessage[2] == "1234")
                     {
                         console.log("equal2");
                     }
