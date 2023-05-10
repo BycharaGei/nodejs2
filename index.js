@@ -67,13 +67,17 @@ server.on('request', (req, res) =>
                         hostPassword = data.trim();
                         console.log(hostPassword + " " + splitMessage[2]);
                     });
-                    if (splitMessage[2] === hostPassword)
+                    if (hostPassword == "1234")
                     {
                         console.log("equal1");
                     }
                     if (splitMessage[2] == "1234")
                     {
                         console.log("equal2");
+                    }
+                    if (splitMessage[2] == hostPassword)
+                    {
+                        console.log("equal3");
                     }
                     if (host == -1 && splitMessage[2] === hostPassword)
                     {
