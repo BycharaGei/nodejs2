@@ -73,6 +73,7 @@ server.on('request', (req, res) =>
                         if (foundReconnection)
                         {
                             activePlayers[newPlayer] = true;
+                            deactivatedPlayers[newPlayer] = false;
                             reconnectionDataRequired[newPlayer] = true;
                             res.write("success:" + gameID + ":" + newPlayer);
                             res.end();
@@ -162,6 +163,10 @@ server.on('request', (req, res) =>
                         allFirstTurnsTerminated = false;
                         currentPlayer = 0;
                         firstTurnData = "makefirstturn:";
+                    }
+                    else
+                    {
+                        dataSendingRequired[hostNumber] = true;
                     }
                     res.write(activePlayers.length.toString());
                     res.end();
