@@ -21,7 +21,6 @@ let firstTurnCompleted = false;
 let firstTurnData = "makefirstturn:";
 const reconnectionDataRequired = [];
 const reconnectionDataRequiredSpectators = [];
-//add check in connection if game startet, if so load all cells as response;
 
 server.on('request', (req, res) => 
 {
