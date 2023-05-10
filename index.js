@@ -172,6 +172,7 @@ server.on('request', (req, res) =>
                 {
                     res.write("reset");
                     res.end();
+                    console.log("close host");
                 }
             }
             else if (parseInt(splitMessage[1]) != gameID)
