@@ -67,6 +67,14 @@ server.on('request', (req, res) =>
                         hostPassword = data.trim();
                         console.log(hostPassword + " " + splitMessage[2]);
                     });
+                    if (splitMessage[2] === hostPassword)
+                    {
+                        console.log("equal1");
+                    }
+                    if (splitMessage[2] == hostPassword)
+                    {
+                        console.log("equal2");
+                    }
                     if (host == -1 && splitMessage[2] === hostPassword)
                     {
                         dataSent.push(false);
