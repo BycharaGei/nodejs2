@@ -21,6 +21,7 @@ let firstTurnData = "makefirstturn:";
 //add check in connection if game startet, if so load all cells as response;
 //fix kick buttons;
 //add leave host button (full game reset);
+//
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
