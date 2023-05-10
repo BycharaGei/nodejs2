@@ -16,7 +16,7 @@ let dataToSend = null;
 let firstTurnCompleted = false;
 const firstTurnTerminated = [];
 let firstTurnData = "makefirstturn:";
-//
+
 server.on('request', (req, res) => 
 {
     if (req.method === 'POST') 
@@ -67,38 +67,6 @@ server.on('request', (req, res) =>
                     }
                 }
             }
-            /*else if (resetting && splitMessage[0] != "connect")
-            {
-                if (parseInt(splitMessage[1]) != host)
-                {
-                    console.log("resetted " + splitMessage[1]);
-                    res.write("reset");
-                    res.end();
-                }
-                resetted[parseInt(splitMessage[1])] = true;
-                let foundFalse = false;
-                for (let i = 0; i < resetted.length; ++i)
-                {
-                    if (!resetted[i])
-                    {
-                        foundFalse = true;
-                    }
-                }
-                if (!foundFalse)
-                {
-                    activePlayers.length = 0;
-                    activePlayers.push(true);
-                    dataSent.length = 0;
-                    dataSent.push(false);
-                    firstTurnTerminated.length = 0;
-                    firstTurnTerminated.push(false);
-                    resetted.length = 0;
-                    resetted.push(false);
-                    host = 0;
-                    resetting = false;
-                    gameStarted = false;
-                }
-            }*/
             else if (splitMessage[0] === 'host')
             {
                 console.log(message + " gameID = " + gameID + ", host = " + host);
@@ -428,22 +396,6 @@ function makeTurn(row, column)
             }
         }
     }
-    /*let lastPlayer = currentPlayer;
-    let newPlayer = currentPlayer;
-    do
-    {
-        newPlayer++;
-        if (newPlayer >= activePlayers.length)
-        {
-            newPlayer = 0;
-        }
-        if (newPlayer == lastPlayer)
-        {
-            break;
-        }
-    }
-    while (!activePlayers[newPlayer]);
-    currentPlayer = newPlayer;*/
     for (let i = 0; i < activePlayers.length; ++i)
     {
         currentPlayer++;
@@ -459,45 +411,3 @@ function makeTurn(row, column)
         }
     }
 }
-
-/*import java.io.*;
-import java.net.*;
-
-public class LongPollingClient {
-    private static final String SERVER_URL = "https://nodejs-production-e5a3.up.railway.app";
-    private static final String CONNECTING_MESSAGE = "connecting";
-    private static final String WAITING_MESSAGE = "waiting";
-
-    public static void main(String[] args) {
-        try {
-            URL url = new URL(SERVER_URL);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-            connection.setDoOutput(true);
-            OutputStreamWriter out = new OutputStreamWriter(connection.getOutputStream());
-            out.write(CONNECTING_MESSAGE);
-            out.flush();
-            out.close();
-            connection.disconnect();
-
-            while (true) {
-                HttpURLConnection waitingConnection = (HttpURLConnection) url.openConnection();
-                waitingConnection.setRequestMethod("POST");
-                waitingConnection.setDoOutput(true);
-                OutputStreamWriter waitingOut = new OutputStreamWriter(waitingConnection.getOutputStream());
-                waitingOut.write(WAITING_MESSAGE);
-                waitingOut.flush();
-                waitingOut.close();
-
-                BufferedReader in = new BufferedReader(new InputStreamReader(waitingConnection.getInputStream()));
-                String message = in.readLine();
-                if (message != null) {
-                    System.out.println("Received message from server: " + message);
-                }
-                waitingConnection.disconnect();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-}*/
