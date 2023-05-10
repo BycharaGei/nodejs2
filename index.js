@@ -64,7 +64,7 @@ server.on('request', (req, res) =>
                           console.error('Error reading file:', err);
                           return;
                         }
-                        hostPassword = data.trim();
+                        hostPassword = data.trim().toString();
                         console.log(hostPassword + " " + splitMessage[2]);
                     });
                     if (hostPassword == "1234")
