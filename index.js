@@ -57,10 +57,15 @@ server.on('request', (req, res) =>
                 {
                     console.log('connect host');
                     let hostPassword;
-                    fs.readFile('/host.txt', 'utf8', (err, data) => 
+                    fs.readFile('host.txt', 'utf8', (err, data) => 
                     {
-                        hostPassword = data;
-                        console.log(hostPassword);
+                        if (err) 
+                        {
+                          console.error('Error reading file:', err);
+                          return;
+                        }
+                        hostPassword = data.trim();
+                        console.log('Host Password:', hostPassword);
                     });
                     if (host == -1 && splitMessage[2] === hostPassword)
                     {
