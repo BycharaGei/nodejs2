@@ -307,7 +307,6 @@ server.on('request', (req, res) =>
                         if (parseInt(splitMessage[2]) < 0)
                         {
                             let index = parseInt(splitMessage[2]) * (-1) - 1;
-                            console.log("spectator " + index.toString());
                             if (reconnectionDataRequiredSpectators[index])
                             {
                                 reconnectionDataRequiredSpectators[index] = false;
