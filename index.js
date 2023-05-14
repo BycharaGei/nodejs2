@@ -307,6 +307,7 @@ server.on('request', (req, res) =>
                         if (parseInt(splitMessage[2]) < 0)
                         {
                             let index = parseInt(splitMessage[2]) * (-1) - 1;
+                            console.log("spectator " + index.toString());
                             if (reconnectionDataRequiredSpectators[index])
                             {
                                 reconnectionDataRequiredSpectators[index] = false;
@@ -413,24 +414,6 @@ server.on('request', (req, res) =>
                                 res.end();
                             }
                         }
-                        /*if (lastSentData[parseInt(splitMessage[2])] < dataToSend.length)
-                        {
-                            res.write(dataToSend[lastSentData[parseInt(splitMessage[2])]++]);
-                            res.end();
-                        }
-                        else
-                        {
-                            if (currentPlayer == parseInt(splitMessage[2]))
-                            {
-                                res.write(firstTurnData);
-                                res.end();
-                            }
-                            else
-                            {
-                                res.write("wait");
-                                res.end();
-                            }
-                        }*/
                     }
                     else if (splitMessage[0] === 'firstturn' && parseInt(splitMessage[2]) == currentPlayer)
                     {
